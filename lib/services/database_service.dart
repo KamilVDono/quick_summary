@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 class DatabaseService {
   // === Implementation
   static const databaseFileName = "summaries.db";
-  Database _database;
+  Database? _database;
 
   Future<int> addSummary(Summary summary) async {
     final db = await _db();
@@ -63,7 +63,8 @@ class DatabaseService {
     if (!(_database?.isOpen ?? false)) {
       await _init();
     }
-    return _database;
+    // _init creates _database instance so it should not be null here
+    return _database!;
   }
 
   Future<void> _init() async {

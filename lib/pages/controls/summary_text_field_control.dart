@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class SummaryTextField extends StatelessWidget {
   const SummaryTextField({
-    Key key,
-    @required TextEditingController summaryTextController,
-    @required this.onTap,
+    Key? key,
+    required TextEditingController summaryTextController,
+    this.onTap,
   })  : _summaryTextController = summaryTextController,
         super(key: key);
 
   final TextEditingController _summaryTextController;
-  final Function() onTap;
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {

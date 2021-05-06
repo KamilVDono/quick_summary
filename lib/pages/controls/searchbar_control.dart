@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SearchBar extends StatelessWidget {
-  const SearchBar({Key key, this.onSearchChanged}) : super(key: key);
+  const SearchBar({Key? key, required this.onSearchChanged}) : super(key: key);
 
   final Function(String) onSearchChanged;
 
@@ -13,11 +13,13 @@ class SearchBar extends StatelessWidget {
         autofocus: true,
         onChanged: onSearchChanged,
         decoration: InputDecoration(
-            labelText: "Search",
-            hintText: "Search",
-            prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(12.0)))),
+          labelText: "Search",
+          hintText: "Search",
+          prefixIcon: Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          ),
+        ),
       ),
     );
   }

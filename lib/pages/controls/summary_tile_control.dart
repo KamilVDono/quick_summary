@@ -5,10 +5,10 @@ import 'package:quick_summary/services/database_service.dart';
 
 class SummaryTile extends StatelessWidget {
   const SummaryTile({
-    Key key,
-    @required this.dateFormat,
-    @required this.summary,
-    @required this.expandedOnStart,
+    Key? key,
+    required this.dateFormat,
+    required this.summary,
+    required this.expandedOnStart,
   }) : super(key: key);
 
   final DateFormat dateFormat;
@@ -31,9 +31,18 @@ class SummaryTile extends StatelessWidget {
             summary.title,
             style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
-          trailing: Text(
+          subtitle: Text(
             dateFormat.format(summary.creationTime),
             style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w300),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {},
+              ),
+            ],
           ),
           children: <Widget>[
             Padding(

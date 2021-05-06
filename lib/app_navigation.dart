@@ -45,7 +45,7 @@ class _AppNavigationState extends State<AppNavigation> {
     return AddSummaryPage();
   }
   
-  List<Widget> _actions(){
+  List<Widget>? _actions(){
     if(_pageIndex == 0){
       return [
         IconButton(

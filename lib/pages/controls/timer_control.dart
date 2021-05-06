@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class TimerControl extends StatelessWidget {
   const TimerControl({
-    Key key,
-    @required double leftTime,
+    Key? key,
+    required double leftTime,
   }) : _leftTime = leftTime, super(key: key);
 
   final double _leftTime;

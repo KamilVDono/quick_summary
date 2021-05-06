@@ -4,7 +4,8 @@ class SummaryTitleDialog extends StatelessWidget {
   final Function(String) callback;
   final _titleTextController = TextEditingController();
 
-  SummaryTitleDialog({Key key, this.callback}) : super(key: key);
+  SummaryTitleDialog({Key? key, required this.callback})
+      : super(key: key);
 
   void save(BuildContext context) {
     callback(_titleTextController.text);
@@ -30,7 +31,7 @@ class SummaryTitleDialog extends StatelessWidget {
         ],
       ),
       actions: <Widget>[
-        RaisedButton(
+        ElevatedButton(
           child: const Text("Save"),
           onPressed: () => save(context),
         ),

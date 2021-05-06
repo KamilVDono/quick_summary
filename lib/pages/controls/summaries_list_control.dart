@@ -5,13 +5,13 @@ import 'package:quick_summary/pages/controls/summary_tile_control.dart';
 
 class SummariesList extends StatelessWidget {
   const SummariesList({
-    Key key,
-    @required this.dateFormat,
-    @required this.summaries,
-    @required this.expandedOnStart,
-    @required this.canLoadMore,
-    @required this.isLoading,
-    @required this.loadMoreCallback,
+    Key? key,
+    required this.dateFormat,
+    required this.summaries,
+    required this.expandedOnStart,
+    required this.canLoadMore,
+    required this.isLoading,
+    required this.loadMoreCallback,
   }) : super(key: key);
 
   final DateFormat dateFormat;

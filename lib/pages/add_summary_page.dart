@@ -18,13 +18,12 @@ class _AddSummaryPageState extends State<AddSummaryPage> {
   static const _updateDuration = const Duration(milliseconds: 10);
   final _summaryTextController = TextEditingController();
 
-  Timer _timer;
+  Timer? _timer;
   double _leftTime = Consts.summaryMaxTime;
 
   get _canSave {
     var timeConstrain = _leftTime < Consts.minimumSaveTime;
-    var notEmptyTextConstrain =
-        _summaryTextController.text?.isNotEmpty ?? false;
+    var notEmptyTextConstrain = _summaryTextController.text.isNotEmpty;
     return timeConstrain && notEmptyTextConstrain;
   }
 
@@ -32,7 +31,7 @@ class _AddSummaryPageState extends State<AddSummaryPage> {
     var summaryText = _summaryTextController.text;
     var summaryTitle = await _getSummaryTitle(context);
 
-    if (summaryTitle?.isNotEmpty ?? false) {
+    if (summaryTitle.isNotEmpty) {
       var summary = Summary(summaryTitle, summaryText);
       await _addToDatabase(summary);
       _resetState(context);
@@ -46,7 +45,7 @@ class _AddSummaryPageState extends State<AddSummaryPage> {
   void _resetState(BuildContext context) {
     setState(() {
       if (_timer?.isActive ?? false) {
-        _timer.cancel();
+        _timer!.cancel();
       }
       _timer = null;
       _leftTime = Consts.summaryMaxTime;
@@ -58,10 +57,11 @@ class _AddSummaryPageState extends State<AddSummaryPage> {
   Future<String> _getSummaryTitle(BuildContext context) async {
     String summaryTitle = "";
     await showDialog<String>(
-        context: context,
-        child: SummaryTitleDialog(
-          callback: (t) => summaryTitle = t,
-        ));
+      context: context,
+      builder: (BuildContext context) => SummaryTitleDialog(
+        callback: (t) => summaryTitle = t,
+      ),
+    );
     return summaryTitle;
   }
 
@@ -105,7 +105,7 @@ class _AddSummaryPageState extends State<AddSummaryPage> {
   void dispose() {
     super.dispose();
     if (_timer?.isActive ?? false) {
-      _timer.cancel();
+      _timer!.cancel();
       _timer = null;
     }
   }

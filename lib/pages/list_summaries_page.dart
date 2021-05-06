@@ -9,21 +9,22 @@ import 'package:quick_summary/services/summaries_fetcher.dart';
 class ListSummariesPage extends StatefulWidget {
   final bool showSearchBar;
 
-  const ListSummariesPage({Key key, this.showSearchBar}) : super(key: key);
+  const ListSummariesPage({Key? key, required this.showSearchBar}) : super(key: key);
 
   @override
   _ListSummariesPageState createState() => _ListSummariesPageState();
 }
 
 class _ListSummariesPageState extends State<ListSummariesPage> {
-  DateFormat dateFormat;
+  // TODO: Show loading indicator if not loaded
+  late DateFormat dateFormat;
 
   List<Summary> _summaries = <Summary>[];
   SummariesFetcher _fetcher = SummariesFetcher(5);
   bool _isLoading = true;
   bool _hasMore = true;
 
-  String _searchText;
+  String _searchText = "";
 
   @override
   void initState() {
@@ -79,7 +80,7 @@ class _ListSummariesPageState extends State<ListSummariesPage> {
           SummariesList(
             dateFormat: dateFormat,
             summaries: _filterSummaries(),
-            expandedOnStart: (_searchText?.isNotEmpty ?? false),
+            expandedOnStart: (_searchText.isNotEmpty),
             canLoadMore: _hasMore,
             isLoading: _isLoading,
             loadMoreCallback: _loadMore,
@@ -104,7 +105,7 @@ class _ListSummariesPageState extends State<ListSummariesPage> {
 
 
   List<Summary> _filterSummaries() {
-    return (_searchText?.isNotEmpty ?? false)
+    return (_searchText.isNotEmpty)
         ? _summaries
             .where((s) =>
                 s.summaryText.toLowerCase().contains(_searchText) ||
