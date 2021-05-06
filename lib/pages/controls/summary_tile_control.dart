@@ -3,17 +3,34 @@ import 'package:intl/intl.dart';
 import 'package:quick_summary/data/summary.dart';
 import 'package:quick_summary/services/database_service.dart';
 
-class SummaryTile extends StatelessWidget {
-  const SummaryTile({
+class SummaryTile extends StatefulWidget {
+  SummaryTile({
     Key? key,
     required this.dateFormat,
     required this.summary,
     required this.expandedOnStart,
-  }) : super(key: key);
+  })   : textEditingController = new TextEditingController(),
+        super(key: key) {
+    textEditingController.text = summary.summaryText;
+    textEditingController.addListener(() {
+      summary.summaryText = textEditingController.text;
+    });
+  }
 
   final DateFormat dateFormat;
   final Summary summary;
   final bool expandedOnStart;
+  final TextEditingController textEditingController;
+
+  @override
+  _SummaryTileState createState() => _SummaryTileState(expandedOnStart);
+}
+
+class _SummaryTileState extends State<SummaryTile> {
+  bool _isExpanded;
+  bool _editing = false;
+
+  _SummaryTileState(this._isExpanded);
 
   @override
   Widget build(BuildContext context) {
@@ -22,25 +39,31 @@ class SummaryTile extends StatelessWidget {
       background: Container(color: Colors.red),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
-        DatabaseService().removeSummary(summary);
+        DatabaseService().removeSummary(widget.summary);
       },
       child: Card(
         child: ExpansionTile(
-          initiallyExpanded: expandedOnStart,
+          initiallyExpanded: _isExpanded,
           title: Text(
-            summary.title,
+            widget.summary.title,
             style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
-            dateFormat.format(summary.creationTime),
+            widget.dateFormat.format(widget.summary.creationTime),
             style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w300),
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {},
+                icon: Icon(_editing ? Icons.check_sharp : Icons.edit),
+                onPressed: _isExpanded
+                    ? () {
+                        setState(() {
+                          _editing = !_editing;
+                        });
+                      }
+                    : null,
               ),
             ],
           ),
@@ -53,12 +76,23 @@ class SummaryTile extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(summary.summaryText),
+                    child: _editing
+                        ? TextField(
+                            autofocus: true,
+                            controller: widget.textEditingController,
+                            maxLines: null,
+                          )
+                        : Text(widget.summary.summaryText),
                   ),
                 ],
               ),
             )
           ],
+          onExpansionChanged: (isExpanded) {
+            setState(() {
+              _isExpanded = isExpanded;
+            });
+          },
         ),
       ),
     );

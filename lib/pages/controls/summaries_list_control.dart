@@ -40,6 +40,7 @@ class SummariesList extends StatelessWidget {
               ),
             );
           }
+          
           Summary item = summaries[index];
           return SummaryTile(
             dateFormat: dateFormat,

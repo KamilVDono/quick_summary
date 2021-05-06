@@ -17,6 +17,21 @@ class DatabaseService {
     );
   }
 
+  updateSummary(Summary summary) async {
+    if (summary.id == -1) {
+      return;
+    }
+    final db = await _db();
+    return db.update(
+      Consts.databaseSummariesTable,
+      summary.dump(),
+      // Ensure that the Dog has a matching id.
+      where: "id = ?",
+      // Pass the Dog's id as a whereArg to prevent SQL injection.
+      whereArgs: [summary.id],
+    );
+  }
+
   removeSummary(Summary summary) async {
     if (summary.id == -1) {
       return;

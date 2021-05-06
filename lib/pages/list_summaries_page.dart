@@ -9,7 +9,8 @@ import 'package:quick_summary/services/summaries_fetcher.dart';
 class ListSummariesPage extends StatefulWidget {
   final bool showSearchBar;
 
-  const ListSummariesPage({Key? key, required this.showSearchBar}) : super(key: key);
+  const ListSummariesPage({Key? key, required this.showSearchBar})
+      : super(key: key);
 
   @override
   _ListSummariesPageState createState() => _ListSummariesPageState();
@@ -17,7 +18,7 @@ class ListSummariesPage extends StatefulWidget {
 
 class _ListSummariesPageState extends State<ListSummariesPage> {
   // TODO: Show loading indicator if not loaded
-  late DateFormat dateFormat;
+  DateFormat? _dateFormat;
 
   List<Summary> _summaries = <Summary>[];
   SummariesFetcher _fetcher = SummariesFetcher(5);
@@ -35,16 +36,16 @@ class _ListSummariesPageState extends State<ListSummariesPage> {
   }
 
   void _loadMore({bool initDataFormat = false}) async {
-    _isLoading = true; 
-    
-    if(initDataFormat){
+    _isLoading = true;
+
+    if (initDataFormat) {
       await initializeDateFormatting();
       String languageCode = Localizations.localeOf(context).languageCode;
-      dateFormat = DateFormat("dd.MM.yy HH:mm", languageCode);
+      _dateFormat = DateFormat("dd.MM.yy HH:mm", languageCode);
     }
 
     _fetcher.fetch().then((List<Summary> summariesList) {
-      if(mounted){
+      if (mounted) {
         if (summariesList.isEmpty) {
           setState(() {
             _isLoading = false;
@@ -68,6 +69,10 @@ class _ListSummariesPageState extends State<ListSummariesPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_dateFormat == null) {
+      return Center(child: const CircularProgressIndicator());
+    }
+
     if (!widget.showSearchBar) {
       _searchText = "";
     }
@@ -77,32 +82,28 @@ class _ListSummariesPageState extends State<ListSummariesPage> {
           SearchBar(
             onSearchChanged: _searchChanged,
           ),
-          SummariesList(
-            dateFormat: dateFormat,
-            summaries: _filterSummaries(),
-            expandedOnStart: (_searchText.isNotEmpty),
-            canLoadMore: _hasMore,
-            isLoading: _isLoading,
-            loadMoreCallback: _loadMore,
-          ),
+          buildSummariesList(context),
         ],
       );
     } else {
       return Column(
         children: [
-          SummariesList(
-            dateFormat: dateFormat,
-            summaries: _summaries,
-            expandedOnStart: false,
-            canLoadMore: _hasMore,
-            isLoading: _isLoading,
-            loadMoreCallback: _loadMore,
-          ),
+          buildSummariesList(context),
         ],
       );
     }
   }
 
+  SummariesList buildSummariesList(BuildContext context) {
+    return SummariesList(
+      dateFormat: _dateFormat!,
+      summaries: _filterSummaries(),
+      expandedOnStart: (_searchText.isNotEmpty),
+      canLoadMore: _hasMore,
+      isLoading: _isLoading,
+      loadMoreCallback: _loadMore,
+    );
+  }
 
   List<Summary> _filterSummaries() {
     return (_searchText.isNotEmpty)
@@ -112,10 +113,5 @@ class _ListSummariesPageState extends State<ListSummariesPage> {
                 s.title.toLowerCase().contains(_searchText))
             .toList()
         : _summaries;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }
