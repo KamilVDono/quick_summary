@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quick_summary/pages/add_summary_page.dart';
 import 'package:quick_summary/pages/list_summaries_page.dart';
+import 'package:quick_summary/services/database_service.dart';
 import 'package:quick_summary/utils/consts.dart';
 
 class AppNavigation extends StatefulWidget {
@@ -17,7 +18,7 @@ class _AppNavigationState extends State<AppNavigation> {
     return Scaffold(
       appBar: AppBar(
         title: Text(Consts.appTitle),
-        actions: _actions(),
+        actions: _actions(context),
       ),
       body: _currentPageWidget(),
       bottomNavigationBar: BottomNavigationBar(
@@ -40,17 +41,28 @@ class _AppNavigationState extends State<AppNavigation> {
 
   Widget _currentPageWidget() {
     if (_pageIndex == 0) {
-      return ListSummariesPage(showSearchBar: _visibleSearchBar,);
+      return ListSummariesPage(
+        showSearchBar: _visibleSearchBar,
+      );
     }
     return AddSummaryPage();
   }
-  
-  List<Widget>? _actions(){
-    if(_pageIndex == 0){
+
+  List<Widget>? _actions(BuildContext context) {
+    if (_pageIndex == 0) {
       return [
         IconButton(
           icon: _visibleSearchBar ? Icon(Icons.cancel) : Icon(Icons.search),
           onPressed: _onSearch,
+        ),
+      ];
+    } else {
+      return [
+        IconButton(
+          icon: Icon(Icons.info),
+          onPressed: () {
+            _showToast(context);
+          },
         ),
       ];
     }
@@ -71,5 +83,23 @@ class _AppNavigationState extends State<AppNavigation> {
     setState(() {
       _visibleSearchBar = !_visibleSearchBar;
     });
+  }
+
+  void _showToast(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: FutureBuilder<String>(
+          future: DatabaseService().databasePath,
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            if (snapshot.hasData) {
+              return Text(snapshot.data!);
+            } else {
+              return Text("Waiting");
+            }
+          },
+        ),
+      ),
+    );
   }
 }

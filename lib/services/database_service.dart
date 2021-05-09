@@ -7,6 +7,10 @@ class DatabaseService {
   // === Implementation
   static const databaseFileName = "summaries.db";
   Database? _database;
+  
+  Future<String> get databasePath async{
+    return join(await getDatabasesPath(), databaseFileName);
+  }
 
   Future<int> addSummary(Summary summary) async {
     final db = await _db();
@@ -84,7 +88,7 @@ class DatabaseService {
 
   Future<void> _init() async {
     _database = await openDatabase(
-      join(await getDatabasesPath(), databaseFileName),
+      await databasePath,
       onCreate: (db, version) {
         return _createSummariesTable(db);
       },
