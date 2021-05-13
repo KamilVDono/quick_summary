@@ -9,11 +9,11 @@ class Summary {
 
   int _timeStamp = 0;
 
-  get creationTime => Utils.dateTimeFromMilliseconds(_timeStamp);
+  DateTime get creationTime => Utils.dateTimeFromMilliseconds(_timeStamp);
   String get title => _title;
   String get summaryText => _summaryText;
   set summaryText(String value) {
-    if(_summaryText != value) {
+    if (_summaryText != value) {
       _summaryText = value;
       DatabaseService().updateSummary(this);
     }
@@ -22,6 +22,13 @@ class Summary {
   Summary(this._title, this._summaryText) : id = -1 {
     _timeStamp = Utils.currentDateMilliseconds();
   }
+
+  bool valueEqual(Summary other) {
+    return _title == other._title &&
+        _summaryText == other._summaryText &&
+        _timeStamp == other._timeStamp;
+  }
+
   Summary.fromDatabase(Map<String, dynamic> databaseEntry)
       : id = databaseEntry[Consts.databaseID],
         _title = databaseEntry[Consts.databaseSummaryTitle],

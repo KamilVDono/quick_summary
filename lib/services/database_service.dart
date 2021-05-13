@@ -7,8 +7,8 @@ class DatabaseService {
   // === Implementation
   static const databaseFileName = "summaries.db";
   Database? _database;
-  
-  Future<String> get databasePath async{
+
+  Future<String> get databasePath async {
     return join(await getDatabasesPath(), databaseFileName);
   }
 
@@ -63,13 +63,26 @@ class DatabaseService {
 
   Future<List<Summary>> summariesForPage(int itemsPerPage, int page) async {
     final db = await _db();
-    
+
     final offset = page * itemsPerPage;
 
     final List<Map<String, dynamic>> serializedSummaries = await db.query(
       Consts.databaseSummariesTable,
       offset: offset,
       limit: itemsPerPage,
+      orderBy: Consts.databaseSummaryTime + " DESC",
+    );
+
+    return serializedSummaries.isNotEmpty
+        ? serializedSummaries.map((s) => Summary.fromDatabase(s)).toList()
+        : [];
+  }
+
+  static Future<List<Summary>> allSummariesFromFile(String filePath) async {
+    final db = await openDatabase(filePath);
+
+    final List<Map<String, dynamic>> serializedSummaries = await db.query(
+      Consts.databaseSummariesTable,
       orderBy: Consts.databaseSummaryTime + " DESC",
     );
 

@@ -1,12 +1,13 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:quick_summary/data/kebab_menu_item.dart';
 import 'package:quick_summary/pages/add_summary_page.dart';
+import 'package:quick_summary/pages/file_pick_page.dart';
 import 'package:quick_summary/pages/list_summaries_page.dart';
 import 'package:quick_summary/services/database_service.dart';
 import 'package:quick_summary/utils/consts.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:quick_summary/utils/utils.dart';
 
 class AppNavigation extends StatefulWidget {
   @override
@@ -18,6 +19,11 @@ class _AppNavigationState extends State<AppNavigation> {
 
   var _pageIndex = 1;
   var _visibleSearchBar = false;
+
+  Future<String> get cacheDirectory async {
+    Directory rootPath = (await getExternalCacheDirectories())![0];
+    return rootPath.path;
+  }
 
   @override
   void initState() {
@@ -108,8 +114,7 @@ class _AppNavigationState extends State<AppNavigation> {
   }
 
   void _onExport(BuildContext context) async {
-    Directory rootPath = (await getExternalCacheDirectories())![0];
-    var targetPath = rootPath.path;
+    var targetPath = await cacheDirectory;
 
     var databasePath = await DatabaseService().databasePath;
     var databaseFile = File(databasePath);
@@ -124,19 +129,33 @@ class _AppNavigationState extends State<AppNavigation> {
     var newFile = databaseFile.copySync(
         '$targetPath/export_${day}_${month}_${year}_$hour:$minute:$second.db');
     String filePath = newFile.path;
-    _showToast(context, 'Exported to $filePath');
+    Utils.showToast(context, 'Exported to $filePath');
   }
 
-  void _onImport(BuildContext context) {
-    print("OnImport");
-  }
-
-  void _showToast(BuildContext context, String text) {
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: Text(text),
+  void _onImport(BuildContext context) async {
+    // TODO: Move it to own route and page
+    var exportDirectory = Directory(await cacheDirectory);
+    final String? path = (await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FilePickPage(
+          rootDirectory: exportDirectory,
+        ),
       ),
-    );
+    ));
+    if (path == null) {
+      return;
+    }
+
+    final loadedSummaries = await DatabaseService.allSummariesFromFile(path);
+    final defaultSummaries = await DatabaseService().allSummaries();
+
+    var missingSummaries = loadedSummaries
+        .where((ls) => !defaultSummaries.any((ds) => ds.valueEqual(ls)))
+        .toList();
+
+    missingSummaries.forEach((summary) async {
+      await DatabaseService().addSummary(summary);
+    });
   }
 }
